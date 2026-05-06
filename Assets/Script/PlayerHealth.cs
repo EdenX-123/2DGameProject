@@ -82,17 +82,63 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
+        if (isDead) return;
         isDead = true;
 
-        anim.SetTrigger("isDead"); // play death animation
+        StopAllCoroutines();
 
-        GetComponent<PlayerCtrl>().enabled = false; // disable movement
+        anim.SetTrigger("isDead");
         
-        Rigidbody2D rb = GetComponentInChildren<Rigidbody2D>();
+        PlayerCtrl ctrl = GetComponent<PlayerCtrl>();
+        if (ctrl != null)
+        {
+            ctrl.enabled = false;
+            ctrl.isKnockedBack = false;
+            ctrl.isDroppingDead = false;
+        }
+
+        rb.linearVelocity = Vector2.zero;
+        rb.constraints = RigidbodyConstraints2D.FreezeAll; // ✅ 防止滑行
+
+        StartCoroutine(RespawnCoroutine());
+    }
+
+    IEnumerator RespawnCoroutine()
+    {
+        yield return new WaitForSeconds(3f); // 等死亡动画
+
+        GameManager.instance.PlayerDied();
+        transform.position = GameManager.instance.GetDefaultRespawnPos();
+
+        // 重置状态
+        isDead = false;
+        currentHealth = maxHealth;
+        isInvincible = true; // ✅ 先开无敌
+
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         rb.linearVelocity = Vector2.zero;
 
-        // 可选：冻结
-        rb.constraints = RigidbodyConstraints2D.FreezeAll;
+        // 重启移动但先锁住输入
+        PlayerCtrl ctrl = GetComponent<PlayerCtrl>();
+        if (ctrl != null)
+        {
+            ctrl.enabled = true;
+            ctrl.isKnockedBack = true;  // ✅ 用isKnockedBack锁住输入
+            ctrl.isDroppingDead = false;
+        }
+
+        anim.Rebind();
+        anim.Update(0f);
+
+        // ✅ 等相机跟上（等几秒无敌时间）
+        yield return new WaitForSeconds(1f);
+
+        // ✅ 解除锁定，可以行动了
+        isInvincible = false;
+        if (ctrl != null)
+            ctrl.isKnockedBack = false;
+
+        Debug.Log("Player respawned and ready!");
     }
 
 }

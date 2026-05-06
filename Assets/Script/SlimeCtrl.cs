@@ -92,6 +92,7 @@ public class SlimeCtrl : MonoBehaviour
         if (transform.position.y < deathY)
         {
             GetComponent<Enemy_Health>().Die();
+            Destroy(gameObject, 1f);
         }
     }
 
@@ -119,7 +120,7 @@ public class SlimeCtrl : MonoBehaviour
         if (hitWall)
         {
 
-            if (hitWall) Debug.Log("Wall: = " + checkPos + " | movingRight = " + movingRight);
+            // if (hitWall) Debug.Log("Wall: = " + checkPos + " | movingRight = " + movingRight);
   
             StartCoroutine(FlipWithDelay());
         }

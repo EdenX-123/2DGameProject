@@ -29,7 +29,7 @@ public class PlayerCtrl : MonoBehaviour
 
     float moveX;
     bool isGrounded;
-     public bool isKnockedBack = false; // 被击退时 FixedUpdate 不干扰
+    public bool isKnockedBack = false; // 被击退时 FixedUpdate 不干扰
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -60,9 +60,10 @@ public class PlayerCtrl : MonoBehaviour
 
     }
     
-    private bool isDroppingDead = false;
+    public bool isDroppingDead = false;
     IEnumerator FallDeath()
     {
+
         isDroppingDead = true;
         isKnockedBack = true;
 
@@ -70,34 +71,40 @@ public class PlayerCtrl : MonoBehaviour
         anim.SetBool("isRunning", false);
         anim.SetBool("isJumping", true);
 
-        // 先弹一下再下落
-        rb.gravityScale = 1f; // 确保重力正常
+        rb.gravityScale = 1f;
         rb.linearVelocity = new Vector2(0f, 4f);
 
         yield return new WaitForSeconds(0.3f);
-
-        // 加速下落
         rb.gravityScale = 4f;
 
         yield return new WaitForSeconds(0.8f);
 
-        // 全部重置后再传送
         rb.gravityScale = 3f;
         rb.linearVelocity = Vector2.zero;
 
-        yield return null; // 等一帧确保物理更新完成
+        yield return null;
 
-        transform.position = respawnPoint.position;
+        // 用 GameManager 的当前复活点
+        transform.position = GameManager.instance.GetCheckpointPos();
+        PlayerHealth.isInvincible = true; // 复活后短暂无敌
+        PlayerHealth.TakeDamage(1, ignoreInvincible: true);
+        yield return null;
 
-        yield return null; // 再等一帧
+        anim.SetBool("isJumping", false);
+        anim.SetBool("isGrounded", true);
+
+
+        // ✅ 无敌时间，等相机跟上
+        PlayerHealth.isInvincible = true;
+        isKnockedBack = true; // 锁住输入
+        PlayerHealth.isInvincible = false;
+
+        yield return new WaitForSeconds(1f); 
 
         isDroppingDead = false;
         isKnockedBack = false;
-
         anim.SetBool("isJumping", false);
 
-        // 强制扣血
-        PlayerHealth.TakeDamage(1, ignoreInvincible: true);
     }
 
     // Handle player movement and jumping

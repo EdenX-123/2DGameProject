@@ -39,9 +39,7 @@ public class PauseManager : MonoBehaviour
 
     public void QuitGame()
     {
-        SceneManager.LoadScene("MainMenu");
-
-        // 编辑器里不会退出
-        Application.Quit();
+        SceneTransition.instance.LoadScene("MainMenu");
+        Time.timeScale = 1f; // continue
     }
 }

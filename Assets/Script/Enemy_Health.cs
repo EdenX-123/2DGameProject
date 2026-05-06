@@ -65,7 +65,13 @@ public class Enemy_Health : MonoBehaviour
 
     // Update is called once per frame
     public void Die()
-    {
+    {   
+        GetComponent<SlimeCtrl>().enabled = false;
+        foreach (Collider2D col in GetComponentsInChildren<Collider2D>())
+        {
+            col.enabled = false;
+        }
+
         isDead = true;
 
         anim.SetTrigger("isDead");
@@ -73,7 +79,6 @@ public class Enemy_Health : MonoBehaviour
         // 停止移动
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         rb.linearVelocity = Vector2.zero;
-
         // 可选：冻结
         rb.constraints = RigidbodyConstraints2D.FreezeAll;
 

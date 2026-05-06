@@ -17,7 +17,7 @@ public class SlimeDamageZone : MonoBehaviour
         if (player != null)
         {
             player.TakeDamageWithKnockback(slimeCtrl.touchDamage, slimeCtrl.transform.position);
-            Debug.Log("DamageBox hit player!");
+            // Debug.Log("DamageBox hit player!");
         }
     }
 }
