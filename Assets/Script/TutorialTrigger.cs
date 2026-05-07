@@ -27,7 +27,7 @@ public class TutorialTrigger : MonoBehaviour
                 activeTrigger.StopAllCoroutines();
 
             activeTrigger = this;
-            StartCoroutine(ShowTutorial());
+            // StartCoroutine(ShowTutorial());
         }
     }
 

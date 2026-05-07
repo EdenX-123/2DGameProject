@@ -28,6 +28,7 @@ public class PauseManager : MonoBehaviour
         pausePanel.SetActive(true);
         Time.timeScale = 0f; // pause
         isPaused = true;
+        GameTimer.instance?.PauseTimer();
     }
 
     public void Resume()
@@ -35,6 +36,7 @@ public class PauseManager : MonoBehaviour
         pausePanel.SetActive(false);
         Time.timeScale = 1f; // continue
         isPaused = false;
+        GameTimer.instance?.ResumeTimer();
     }
 
     public void QuitGame()

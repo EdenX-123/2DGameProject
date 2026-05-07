@@ -5,6 +5,7 @@ public class MainMenu : MonoBehaviour
 {
     public void StartGame()
     {
+        GameTimer.instance.StartTimer();
         SceneTransition.instance.LoadScene("TutorialLevel");
     }
 
