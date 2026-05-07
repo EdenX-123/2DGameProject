@@ -121,6 +121,7 @@ public class PlayerCtrl : MonoBehaviour
         if ((Keyboard.current.zKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame) && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            AudioManager.instance.PlayJump();
         }
 
         anim.SetBool("isGrounded", isGrounded);

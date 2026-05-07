@@ -37,6 +37,7 @@ public class PlayerHealth : MonoBehaviour
         Debug.Log("Player HP: " + currentHealth);
 
         anim.SetTrigger("isHurt");
+        AudioManager.instance.PlayTakeDamage();
         StartCoroutine(InvincibleCoroutine());
 
         if (currentHealth <= 0)

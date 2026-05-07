@@ -5,7 +5,7 @@ public class MainMenu : MonoBehaviour
 {
     public void StartGame()
     {
-        SceneTransition.instance.LoadScene("MainGame");
+        SceneTransition.instance.LoadScene("TutorialLevel");
     }
 
     public void QuitGame()

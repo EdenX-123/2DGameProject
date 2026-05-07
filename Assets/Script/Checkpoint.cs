@@ -20,6 +20,7 @@ public class Checkpoint : MonoBehaviour
         if (cm != null && checkpointIndex <= cm.currentIndex) return;
 
         isActivated = true;
+        AudioManager.instance.PlayCheckpoint();
         if (cm != null) cm.currentIndex = checkpointIndex;
 
         // anim?.SetTrigger("activate");
