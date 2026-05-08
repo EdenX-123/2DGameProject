@@ -64,7 +64,7 @@ public class SlimeCtrl : MonoBehaviour
         // 游戏开始时保存世界坐标，之后巡逻点跟着动也没关系
         if (patrolPointLeft != null)  patrolLeftX  = patrolPointLeft.position.x;
         if (patrolPointRight != null) patrolRightX = patrolPointRight.position.x;
-
+        
     }
 
     // Update is called once per frame
@@ -92,6 +92,7 @@ public class SlimeCtrl : MonoBehaviour
         if (transform.position.y < deathY)
         {
             GetComponent<Enemy_Health>().Die();
+            Destroy(gameObject, 1f);
         }
     }
 
@@ -111,9 +112,16 @@ public class SlimeCtrl : MonoBehaviour
         if (isKnockedBack || isFlipping) return;
         if (wallCheckCooldown > 0) return; // ✅ 冷却中不检测
 
-        bool hitWall = Physics2D.OverlapCircle(wallCheckFront.position, wallCheckRadius, wallLayer);
+        // 根据朝向决定检测哪侧
+        float dir = movingRight ? 1f : -1f;
+        Vector2 checkPos = (Vector2)transform.position + new Vector2(dir * wallCheckRadius * 2f, 0f);
+
+        bool hitWall = Physics2D.OverlapCircle(checkPos, wallCheckRadius, wallLayer);
         if (hitWall)
         {
+
+            // if (hitWall) Debug.Log("Wall: = " + checkPos + " | movingRight = " + movingRight);
+  
             StartCoroutine(FlipWithDelay());
         }
     }
@@ -167,7 +175,7 @@ public class SlimeCtrl : MonoBehaviour
             {
                 transform.position = new Vector3(patrolRightX, transform.position.y, transform.position.z);
                 movingRight = false;
-                Flip(); // ✅ 统一用Flip()
+                spriteRenderer.flipX = true;
             }
         }
         else
@@ -177,7 +185,7 @@ public class SlimeCtrl : MonoBehaviour
             {
                 transform.position = new Vector3(patrolLeftX, transform.position.y, transform.position.z);
                 movingRight = true;
-                Flip(); // ✅ 统一用Flip()
+                spriteRenderer.flipX = false;
             }
         }
     }
@@ -189,30 +197,33 @@ public class SlimeCtrl : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(moveSpeed, rb.linearVelocity.y);
 
-            // 检测右边是否到边缘（地面消失）
+            // 用edgeCheckRight的X偏移，但基于transform重新算世界坐标
             bool rightEdge = edgeCheckRight != null &&
-                !Physics2D.OverlapCircle(edgeCheckRight.position, edgeCheckRadius, groundLayer);
+                !Physics2D.OverlapCircle(
+                    new Vector2(transform.position.x + Mathf.Abs(edgeCheckRight.localPosition.x), 
+                                edgeCheckRight.position.y),
+                    edgeCheckRadius, groundLayer);
 
-            if (rightEdge) Flip();
+            if (rightEdge) { movingRight = false; spriteRenderer.flipX = true; }
         }
         else
         {
             rb.linearVelocity = new Vector2(-moveSpeed, rb.linearVelocity.y);
 
             bool leftEdge = edgeCheckLeft != null &&
-                !Physics2D.OverlapCircle(edgeCheckLeft.position, edgeCheckRadius, groundLayer);
+                !Physics2D.OverlapCircle(
+                    new Vector2(transform.position.x - Mathf.Abs(edgeCheckLeft.localPosition.x),
+                                edgeCheckLeft.position.y),
+                    edgeCheckRadius, groundLayer);
 
-            if (leftEdge) Flip();
+            if (leftEdge) { movingRight = true; spriteRenderer.flipX = false; }
         }
     }
 
     void Flip()
     {
         movingRight = !movingRight;
-        // 用Scale翻转，所有子物体自动跟着镜像 ✅
-        Vector3 scale = transform.localScale;
-        scale.x *= -1;
-        transform.localScale = scale;
+        spriteRenderer.flipX = !movingRight;
     }
 
     void OnTriggerStay2D(Collider2D other)

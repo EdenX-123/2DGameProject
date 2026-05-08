@@ -48,6 +48,7 @@ public class Player_Combat : MonoBehaviour
         {
             anim.SetTrigger("Attack");
             timer = cooldown;
+            AudioManager.instance.PlayAttack();
         }
     }
 
