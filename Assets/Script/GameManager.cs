@@ -25,6 +25,9 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
 
+        Application.targetFrameRate = 120; // 或 144 / 165
+        QualitySettings.vSyncCount = 0;
+
         // 默认复活点必须在 Awake 设置
         if (defaultRespawnPoint != null)
             currentCheckpointPos = defaultRespawnPoint.position;

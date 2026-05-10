@@ -6928,7 +6928,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.5
+  m_Volume: 0.01
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -7269,7 +7269,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -35, y: 15, z: -10}
+  m_LocalPosition: {x: -35, y: 15, z: -12}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7288,12 +7288,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   target: {fileID: 2037057694}
-  smoothSpeed: 5
+  xSmoothTime: 0.1
+  ySmoothTime: 0.15
   minX: -34
   maxX: 30
   minY: -3
   maxY: 24
   yFollowThreshold: 2
+  yOffset: 1
   platformSectionX: 30
 --- !u!1 &520127571
 GameObject:
@@ -20429,11 +20431,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 615538302515494185, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -435
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 615538302515494185, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 311.00003
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 814616398665885896, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_Pivot.x
@@ -20517,11 +20519,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1838541548842902029, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -535
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 1838541548842902029, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 311.00003
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4578052646891671902, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -20529,11 +20531,11 @@ PrefabInstance:
       objectReference: {fileID: 159648096}
     - target: {fileID: 5157873255632169025, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -335
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 5157873255632169025, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 311.00003
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6747352198453388366, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -20541,19 +20543,27 @@ PrefabInstance:
       objectReference: {fileID: 159648096}
     - target: {fileID: 8723582266633808810, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -735
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8723582266633808810, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 311
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838700271633012653, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -600
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838700271633012653, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 8969488071133264427, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -635
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 8969488071133264427, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 311.00003
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9004736691421448847, guid: 2f0e750225f0cb84c95650c51022e3e8, type: 3}
       propertyPath: m_Name
