@@ -41,7 +41,7 @@ public class PauseManager : MonoBehaviour
 
     public void QuitGame()
     {
-        SceneTransition.instance.LoadScene("MainMenu");
         Time.timeScale = 1f; // continue
+        SceneTransition.instance.LoadScene("MainMenu");
     }
 }
