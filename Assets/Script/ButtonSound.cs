@@ -5,7 +5,8 @@ public class ButtonSound : MonoBehaviour
 {
     void Start()
     {
-        // 自动给按钮加点击音效
+        // if the button component exists,
+        // add a listener to play the click sound when clicked
         Button btn = GetComponent<Button>();
         if (btn != null)
             btn.onClick.AddListener(() => AudioManager.instance.PlayButtonClick());

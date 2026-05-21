@@ -28,18 +28,26 @@ public class PlayerHealth : MonoBehaviour
 
     }
 
+    //when player takes damage, 
+    //reduce current health by damage amount and trigger hurt animation
     public void TakeDamage(int damage, bool ignoreInvincible = false)
     {
+        //check if player is already dead 
+        // or currently invincible 
+        // (unless ignoreInvincible is true(ignoreInvincible is the damage from falling, which should always apply))
         if (isDead) return;
         if (isInvincible && !ignoreInvincible) return;
 
+        //reduce current health by damage amount
         currentHealth -= damage;
         Debug.Log("Player HP: " + currentHealth);
 
+        //trigger hurt animation and play sound
         anim.SetTrigger("isHurt");
         AudioManager.instance.PlayTakeDamage();
         StartCoroutine(InvincibleCoroutine());
 
+        //if health drops to 0 or below, trigger death
         if (currentHealth <= 0)
         {
             Die();
@@ -81,15 +89,20 @@ public class PlayerHealth : MonoBehaviour
         isInvincible = false;
     }
 
+    //player death logic: trigger death animation, disable player control, and respawn after delay
     void Die()
     {
+        //check if already dead to prevent multiple death triggers
         if (isDead) return;
         isDead = true;
 
+        //stop all movement and actions
         StopAllCoroutines();
 
+        //deadth animation 
         anim.SetTrigger("isDead");
         
+        //disable player control and movement
         PlayerCtrl ctrl = GetComponent<PlayerCtrl>();
         if (ctrl != null)
         {
@@ -98,9 +111,11 @@ public class PlayerHealth : MonoBehaviour
             ctrl.isDroppingDead = false;
         }
 
+        //freeze player in place
         rb.linearVelocity = Vector2.zero;
-        rb.constraints = RigidbodyConstraints2D.FreezeAll; // ✅ 防止滑行
+        rb.constraints = RigidbodyConstraints2D.FreezeAll; // no movement after death
 
+        //respawn after delay
         StartCoroutine(RespawnCoroutine());
     }
 

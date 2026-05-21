@@ -15,11 +15,14 @@ public class EnemySpawner : MonoBehaviour
     {
         
     }
+    
+    //when game starts, spawn an enemy at the spawner's position
     public void SpawnEnemy()
     {
         if (currentEnemy != null) return;
         currentEnemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
     }
+    //when player dies, respawn the enemy at the spawner's position
     public void RespawnEnemy()
     {
         if (currentEnemy != null)

@@ -59,22 +59,23 @@ public class GameManager : MonoBehaviour
         return defaultRespawnPoint.position;
     }
 
-    // 玩家死亡时调用
+    // when player dies, call this to reset game state 
+    // (respawn monsters, reset checkpoints, etc.)
     public void PlayerDied()
     {
-        // 复活所有怪物
+        // respawn all monsters
         foreach (EnemySpawner spawner in allSpawners)
         {
             spawner.RespawnEnemy();
         }
-            // ✅ 重置所有存档点
+            //reset all checkpoints
         foreach (Checkpoint cp in allCheckpoints)
             cp.ResetCheckpoint();
 
-        // ✅ 重置存档点回开始点
+        // reset respawn point to default
         currentCheckpointPos = defaultRespawnPoint.position;
 
-        // ✅ 重置 CheckpointManager index
+        // reset checkpoint manager index for player respawn logic
         if (CheckpointManager.instance != null)
             CheckpointManager.instance.currentIndex = -1;
     }

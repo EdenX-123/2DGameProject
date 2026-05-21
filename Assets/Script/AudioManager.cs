@@ -25,7 +25,7 @@ public class AudioManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject); // 切换场景不销毁
+            DontDestroyOnLoad(gameObject); // change scene without interrupting music
         }
         else
         {
@@ -33,7 +33,7 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-        // 创建两个 AudioSource：一个 BGM 一个 SFX
+        // create two audio sources: one for BGM and one for SFX
         AudioSource[] sources = GetComponents<AudioSource>();
         bgmSource = sources.Length > 0 ? sources[0] : gameObject.AddComponent<AudioSource>();
         sfxSource = sources.Length > 1 ? sources[1] : gameObject.AddComponent<AudioSource>();
@@ -66,6 +66,7 @@ public class AudioManager : MonoBehaviour
         sfxSource.PlayOneShot(clip);
     }
 
+    //link these to player actions, button clicks, etc.
     public void PlayButtonClick()  => PlaySFX(buttonClickSFX);
     public void PlayAttack()       => PlaySFX(attackSFX);
     public void PlayJump()         => PlaySFX(jumpSFX);

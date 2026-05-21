@@ -43,9 +43,11 @@ public class Player_Combat : MonoBehaviour
 
     public void Attack()
     {
-        
+        //when the attack button is pressed and cooldown timer is 0 or less,
+        //trigger attack animation and reset timer
         if (timer <= 0)
         {
+            //attack animation will call StartAttack and EndAttack events to set isAttacking flag
             anim.SetTrigger("Attack");
             timer = cooldown;
             AudioManager.instance.PlayAttack();
@@ -84,23 +86,30 @@ public class Player_Combat : MonoBehaviour
         isAttacking = false;
     }
 
+    //the hit box check method, called during attack animation when isAttacking is true
     void DoHitboxCheck()
     {
+        //calculate hitbox position based on attack point, direction, and distance
         float direction = spriteRenderer.flipX ? -1f : 1f;
         Vector2 hitboxPosition = (Vector2)attackPoint.position + new Vector2(direction * attackDistance, 0);
-
+        //check for enemies in the hitbox area using OverlapBoxAll
         Collider2D[] enemies = Physics2D.OverlapBoxAll(hitboxPosition, attackSize, 0f, enemyLayers);
 
+        //for each enemy hit, apply damage and add to 
+        // hitEnemies set to avoid hitting the same enemy multiple times in one attack
         foreach (Collider2D enemy in enemies)
         {
+            //if enemy is not already hit in this attack, apply damage
             if (!hitEnemies.Contains(enemy))
-            {
+            {   
+                // add enemy to hit set to prevent multiple hits in one attack
                 hitEnemies.Add(enemy);
-                
-            // ✅ 加这个检查，找不到就跳过
+
+            // try to get Enemy_Health component from the enemy or its parent
             Enemy_Health health = enemy.GetComponentInParent<Enemy_Health>();
             if (health == null) continue;
 
+            // apply damage to the enemy's health component
             health.ChangeHealth(-attackDamage, transform.position);
             Debug.Log("Hit: " + enemy.name);
             }

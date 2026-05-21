@@ -110,24 +110,34 @@ public class PlayerCtrl : MonoBehaviour
     // Handle player movement and jumping
     void HandleMovement()
     {
+        //when both left and right are pressed, they cancel out and player doesn't move
+        //start move = 0, then check input to set moveX to -1, 0, or 1
         moveX = 0;
 
+        //this input method allows for multiple keys to be pressed at once
+        // so if both left and right are pressed, they cancel out and player doesn't move
         if (Keyboard.current.leftArrowKey.isPressed)
+            // when press left arrow, player moving left and flip sprite
             moveX = -1;
 
+            // when press right arrow, player moving right and don't flip sprite
         if (Keyboard.current.rightArrowKey.isPressed)
             moveX = 1;
 
+        //when jump key is pressed and player is on the ground, apply jump force
         if ((Keyboard.current.zKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame) && isGrounded)
-        {
+        {   
+    
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             AudioManager.instance.PlayJump();
         }
 
+        //animator parameters
         anim.SetBool("isGrounded", isGrounded);
         anim.SetBool("isJumping", rb.linearVelocity.y > 0.1f);
         anim.SetBool("isRunning", moveX != 0);
-
+        
+        //flip sprite based on movement direction
         if (moveX != 0)
             spriteRenderer.flipX = moveX < 0;
     }
