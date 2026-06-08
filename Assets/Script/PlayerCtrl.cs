@@ -8,6 +8,7 @@ public class PlayerCtrl : MonoBehaviour
 {
     public Player_Combat player_combat;
     public PlayerHealth PlayerHealth;
+    public PlayerEnergy playerEnergy;
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private float deathY = -10f;
     [SerializeField] private Transform respawnPoint;
@@ -38,6 +39,9 @@ public class PlayerCtrl : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
         player_combat = GetComponentInChildren<Player_Combat>();
         PlayerHealth = GetComponent<PlayerHealth>();
+        playerEnergy = GetComponent<PlayerEnergy>();
+        if (playerEnergy == null)
+            playerEnergy = gameObject.AddComponent<PlayerEnergy>();
     
     }
 
@@ -51,6 +55,9 @@ public class PlayerCtrl : MonoBehaviour
 
             if (Keyboard.current.xKey.wasPressedThisFrame)
                 player_combat.Attack();
+
+            if (Keyboard.current.cKey.wasPressedThisFrame && playerEnergy != null)
+                playerEnergy.UseHeal(PlayerHealth);
         }
 
         if (transform.position.y < deathY && !isDroppingDead)

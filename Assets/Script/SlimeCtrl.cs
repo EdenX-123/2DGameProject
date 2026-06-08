@@ -53,6 +53,14 @@ public class SlimeCtrl : MonoBehaviour
     private float wallCheckCooldown = 0f; // 新增
 
     private HashSet<Collider2D> hitTargets = new HashSet<Collider2D>();
+    [Header("Combat Feel")]
+    [SerializeField] private float parryHitStop = 0.06f;
+    [SerializeField] private float parryInvincibleTime = 0.25f;
+    [SerializeField] private float parryPlayerRecoil = 5f;
+    [SerializeField] private float parryEnemyRecoil = 3f;
+    [SerializeField] private float recoilDuration = 0.12f;
+
+    public bool IsAttackActive => isAttacking;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -230,7 +238,7 @@ public class SlimeCtrl : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            PlayerHealth player = other.GetComponent<PlayerHealth>();
+            PlayerHealth player = other.GetComponentInParent<PlayerHealth>();
             if (player != null)
             {
                 player.TakeDamageWithKnockback(touchDamage, transform.position);
@@ -286,9 +294,16 @@ public class SlimeCtrl : MonoBehaviour
         if (hit != null && !hitTargets.Contains(hit))
         {
             hitTargets.Add(hit); // 将命中的目标加入集合
-            PlayerHealth player = hit.GetComponent<PlayerHealth>();
+            PlayerHealth player = hit.GetComponentInParent<PlayerHealth>();
             if (player != null)
             {
+                Player_Combat playerCombat = player.GetComponentInChildren<Player_Combat>();
+                if (playerCombat != null && playerCombat.IsAttackActive)
+                {
+                    TriggerParry(player, playerCombat);
+                    return;
+                }
+
                 // 传入自身位置，让玩家被击退
                 player.TakeDamageWithKnockback(attackDamage, transform.position);
                 Debug.Log("Slime attacked player!");
@@ -302,6 +317,48 @@ public class SlimeCtrl : MonoBehaviour
         isAttacking = false;
         canAttack = true;
         attackTimer = 0.3f;
+    }
+
+    public void ApplyCombatRecoil(Vector2 sourcePosition, float force, float duration)
+    {
+        if (rb == null) return;
+        StartCoroutine(CombatRecoilCoroutine(sourcePosition, force, duration));
+    }
+
+    IEnumerator CombatRecoilCoroutine(Vector2 sourcePosition, float force, float duration)
+    {
+        isKnockedBack = true;
+
+        Vector2 direction = ((Vector2)transform.position - sourcePosition).normalized;
+        if (Mathf.Abs(direction.x) < 0.1f)
+            direction.x = movingRight ? -1f : 1f;
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            rb.linearVelocity = new Vector2(direction.x * force, Mathf.Max(rb.linearVelocity.y, force * 0.25f));
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        rb.linearVelocity = Vector2.zero;
+        isKnockedBack = false;
+        ForceStopFlip();
+    }
+
+    private void TriggerParry(PlayerHealth player, Player_Combat playerCombat)
+    {
+        PlayerEnergy energy = player.GetComponent<PlayerEnergy>();
+        if (energy == null)
+            energy = player.gameObject.AddComponent<PlayerEnergy>();
+
+        energy.AddEnergy(1);
+        player.GrantBriefInvincible(parryInvincibleTime);
+        playerCombat.ApplyCombatRecoil(transform.position, parryPlayerRecoil, recoilDuration);
+        ApplyCombatRecoil(player.transform.position, parryEnemyRecoil, recoilDuration);
+        ResetAttackState();
+        CombatFeedback.HitStop(this, parryHitStop);
+        Debug.Log("Parry!");
     }
 
     private void OnDrawGizmos()

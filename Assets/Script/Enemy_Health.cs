@@ -16,7 +16,7 @@ public class Enemy_Health : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public void ChangeHealth(int amount, Vector2 attackerPosition = default)
+    public void ChangeHealth(int amount, Vector2 attackerPosition = default, PlayerEnergy attackerEnergy = null)
     {
         if (isDead) return;
 
@@ -36,6 +36,9 @@ public class Enemy_Health : MonoBehaviour
         else if (currentHealth <= 0)
         {
             Debug.Log("Enemy died");
+            if (attackerEnergy != null)
+                attackerEnergy.AddEnergy(1);
+
             Die();
         }
     }

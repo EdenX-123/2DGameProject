@@ -23,7 +23,6 @@ public class CameraFollow : MonoBehaviour
     private Vector3 velocity = Vector3.zero;
     private float lockedY;
     private float currentTargetY;
-    private bool isFollowingY = false;
 
     void Start()
     {
@@ -49,12 +48,10 @@ public class CameraFollow : MonoBehaviour
         if (target.position.x >= platformSectionX)
         {
             // 跳跃区域：跟随玩家Y
-            isFollowingY = true;
             targetY = target.position.y + yOffset;
         }
         else
         {
-            isFollowingY = false;
             float yDiff = target.position.y - (lockedY - yOffset);
 
             if (Mathf.Abs(yDiff) > yFollowThreshold)

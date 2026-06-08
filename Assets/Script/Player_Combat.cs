@@ -19,14 +19,31 @@ public class Player_Combat : MonoBehaviour
     private float timer;
     bool isAttacking = false;
     private HashSet<Collider2D> hitEnemies = new HashSet<Collider2D>();
+    private Rigidbody2D rb;
+    private PlayerCtrl playerCtrl;
+    private PlayerHealth playerHealth;
+    private PlayerEnergy playerEnergy;
 
     [SerializeField] private bool showHitbox = true;
+    [Header("Combat Feel")]
+    [SerializeField] private float normalHitStop = 0.035f;
+    [SerializeField] private float parryHitStop = 0.06f;
+    [SerializeField] private float parryInvincibleTime = 0.25f;
+    [SerializeField] private float parryPlayerRecoil = 5f;
+    [SerializeField] private float parryEnemyRecoil = 3f;
+    [SerializeField] private float recoilDuration = 0.12f;
+
+    public bool IsAttackActive => isAttacking;
 
 
     private void Start()
     {
         anim = GetComponentInChildren<Animator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        rb = GetComponentInParent<Rigidbody2D>();
+        playerCtrl = GetComponentInParent<PlayerCtrl>();
+        playerHealth = GetComponentInParent<PlayerHealth>();
+        playerEnergy = GetComponentInParent<PlayerEnergy>();
     }
 
     private void Update()
@@ -86,6 +103,33 @@ public class Player_Combat : MonoBehaviour
         isAttacking = false;
     }
 
+    public void ApplyCombatRecoil(Vector2 sourcePosition, float force, float duration)
+    {
+        if (rb == null) return;
+        StartCoroutine(CombatRecoilCoroutine(sourcePosition, force, duration));
+    }
+
+    IEnumerator CombatRecoilCoroutine(Vector2 sourcePosition, float force, float duration)
+    {
+        if (playerCtrl != null)
+            playerCtrl.isKnockedBack = true;
+
+        Vector2 direction = ((Vector2)rb.transform.position - sourcePosition).normalized;
+        if (Mathf.Abs(direction.x) < 0.1f)
+            direction.x = spriteRenderer != null && spriteRenderer.flipX ? 1f : -1f;
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            rb.linearVelocity = new Vector2(direction.x * force, Mathf.Max(rb.linearVelocity.y, force * 0.35f));
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (playerCtrl != null)
+            playerCtrl.isKnockedBack = false;
+    }
+
     //the hit box check method, called during attack animation when isAttacking is true
     void DoHitboxCheck()
     {
@@ -109,10 +153,45 @@ public class Player_Combat : MonoBehaviour
             Enemy_Health health = enemy.GetComponentInParent<Enemy_Health>();
             if (health == null) continue;
 
+            SlimeCtrl slime = enemy.GetComponentInParent<SlimeCtrl>();
+            if (slime != null && slime.IsAttackActive)
+            {
+                TriggerParry(slime);
+                continue;
+            }
+
             // apply damage to the enemy's health component
-            health.ChangeHealth(-attackDamage, transform.position);
+            health.ChangeHealth(-attackDamage, transform.position, GetPlayerEnergy());
+            CombatFeedback.HitStop(this, normalHitStop);
             Debug.Log("Hit: " + enemy.name);
             }
         }
+    }
+
+    private void TriggerParry(SlimeCtrl slime)
+    {
+        PlayerEnergy energy = GetPlayerEnergy();
+        if (energy != null)
+            energy.AddEnergy(1);
+
+        if (playerHealth != null)
+            playerHealth.GrantBriefInvincible(parryInvincibleTime);
+
+        ApplyCombatRecoil(slime.transform.position, parryPlayerRecoil, recoilDuration);
+        slime.ApplyCombatRecoil(transform.position, parryEnemyRecoil, recoilDuration);
+        slime.ResetAttackState();
+        CombatFeedback.HitStop(this, parryHitStop);
+        Debug.Log("Parry!");
+    }
+
+    private PlayerEnergy GetPlayerEnergy()
+    {
+        if (playerEnergy != null) return playerEnergy;
+
+        playerEnergy = GetComponentInParent<PlayerEnergy>();
+        if (playerEnergy == null && rb != null)
+            playerEnergy = rb.gameObject.AddComponent<PlayerEnergy>();
+
+        return playerEnergy;
     }
 }

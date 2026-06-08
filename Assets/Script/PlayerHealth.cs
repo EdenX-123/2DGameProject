@@ -14,6 +14,7 @@ public class PlayerHealth : MonoBehaviour
     public Animator anim;
     private bool isDead = false;
     private Rigidbody2D rb;
+    private Coroutine invincibleCoroutine;
 
     void Start()
     {
@@ -45,7 +46,7 @@ public class PlayerHealth : MonoBehaviour
         //trigger hurt animation and play sound
         anim.SetTrigger("isHurt");
         AudioManager.instance.PlayTakeDamage();
-        StartCoroutine(InvincibleCoroutine());
+        StartInvincible(invincibleTime);
 
         //if health drops to 0 or below, trigger death
         if (currentHealth <= 0)
@@ -66,6 +67,21 @@ public class PlayerHealth : MonoBehaviour
         StartCoroutine(KnockbackCoroutine(knockbackDir));
     }
 
+    public bool Heal(int amount)
+    {
+        if (isDead || amount <= 0 || currentHealth >= maxHealth) return false;
+
+        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
+        Debug.Log("Player HP: " + currentHealth);
+        return true;
+    }
+
+    public void GrantBriefInvincible(float duration)
+    {
+        if (isDead || duration <= 0f) return;
+        StartInvincible(duration);
+    }
+
     IEnumerator KnockbackCoroutine(Vector2 direction)
     {
         PlayerCtrl ctrl = GetComponent<PlayerCtrl>();
@@ -82,11 +98,20 @@ public class PlayerHealth : MonoBehaviour
         if (ctrl != null) ctrl.isKnockedBack = false;
     }
 
-    IEnumerator InvincibleCoroutine()
+    IEnumerator InvincibleCoroutine(float duration)
     {
         isInvincible = true;
-        yield return new WaitForSeconds(invincibleTime);
+        yield return new WaitForSeconds(duration);
         isInvincible = false;
+        invincibleCoroutine = null;
+    }
+
+    private void StartInvincible(float duration)
+    {
+        if (invincibleCoroutine != null)
+            StopCoroutine(invincibleCoroutine);
+
+        invincibleCoroutine = StartCoroutine(InvincibleCoroutine(duration));
     }
 
     //player death logic: trigger death animation, disable player control, and respawn after delay
@@ -95,9 +120,13 @@ public class PlayerHealth : MonoBehaviour
         //check if already dead to prevent multiple death triggers
         if (isDead) return;
         isDead = true;
+        PlayerEnergy energy = GetComponent<PlayerEnergy>();
+        if (energy != null)
+            energy.ResetEnergy();
 
         //stop all movement and actions
         StopAllCoroutines();
+        invincibleCoroutine = null;
 
         //deadth animation 
         anim.SetTrigger("isDead");
@@ -130,6 +159,9 @@ public class PlayerHealth : MonoBehaviour
         isDead = false;
         currentHealth = maxHealth;
         isInvincible = true; // ✅ 先开无敌
+        PlayerEnergy energy = GetComponent<PlayerEnergy>();
+        if (energy != null)
+            energy.ResetEnergy();
 
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         rb.linearVelocity = Vector2.zero;
